@@ -4,27 +4,59 @@ from energy_system_optimizer.components.battery import Battery
 from energy_system_optimizer.optimization_frameworks.ortools_wrapper import (
     ORToolsWrapper,
 )
-from energy_system_optimizer.optimization_frameworks.variable_types import VariableTypes
 from energy_system_optimizer.optimization_frameworks.objective_types import (
     ObjectiveTypes,
 )
 
 
-def test_basic_battery():
-
-    model = ORToolsWrapper("CBC_MIXED_INTEGER_PROGRAMMING")
-
-    load = [140, 150, 60]
-    battery_config = {
-        "id": 1,
-        "energy_init_kWh": 90,
-        "energy_max_kWh": 200,
-        "power_max_kW": 50,
-        "efficiency": 1,
+def parameterize_battery(id, energy_init, energy_max, power_max, efficiency):
+    return {
+        "id": id,
+        "energy_init_kWh": energy_init,
+        "energy_max_kWh": energy_max,
+        "power_max_kW": power_max,
+        "efficiency": efficiency,
     }
+
+
+def create_discretization(time_steps, step_size):
+    return {"time_steps": time_steps, "dt_h": step_size}
+
+
+def test_battery_charging_discharing():
+    model = ORToolsWrapper.initialize_cbc()
+    battery_config = parameterize_battery(1, 0, 100, 100, 0.8)
+    set_profile = [50, 0, -10]  # positive: charging
+    time_steps = range(len(set_profile))
+    discretization = create_discretization(time_steps, 1)
+    battery = Battery(model, battery_config)
+
+    power_charge, power_discharge, energy, costs_ageing = battery.add_to_model(
+        discretization
+    )
+
+    for t in time_steps:
+        model.add_constraint(
+            power_charge[t] - power_discharge[t] == set_profile[t],
+            f"fixed_battery_power_{t}",
+        )
+
+    model.solve()
+
+    res_energy = [model.get_result(energy[t]) for t in time_steps]
+
+    assert res_energy == pytest.approx([40, 40, 30])
+
+
+def test_battery_grid_integration():
+    model = ORToolsWrapper.initialize_cbc()
+
+    battery_config = parameterize_battery(1, 90, 200, 50, 1)
+    load = [140, 150, 60]
+
     expected_battery_power = [-40, -50]
     time_steps = range(len(load))
-    discretization = {"time_steps": time_steps, "dt_h": 1}
+    discretization = create_discretization(time_steps, 1)
 
     battery = Battery(model, battery_config)
 
