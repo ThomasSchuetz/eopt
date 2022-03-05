@@ -1,3 +1,4 @@
+import py
 from energy_system_optimizer.optimization_frameworks.variable_types import VariableTypes
 from energy_system_optimizer.optimization_frameworks.objective_types import ObjectiveTypes
 from ortools.linear_solver import pywraplp
@@ -6,6 +7,10 @@ from ortools.linear_solver import pywraplp
 class ORToolsWrapper:
     def __init__(self, solver):
         self.model = pywraplp.Solver.CreateSolver(solver)
+
+    @staticmethod
+    def initialize_cbc():
+        return ORToolsWrapper("CBC_MIXED_INTEGER_PROGRAMMING")
 
     def add_variable(self, name, type=VariableTypes.continuous, lb=None, ub=None):
         if type == VariableTypes.binary:
@@ -41,7 +46,10 @@ class ORToolsWrapper:
         self.model.Solve()
 
     def get_result(self, variable):
-        return variable.solution_value()
+        if isinstance(variable, pywraplp.Variable):
+            return variable.solution_value()
+        else:
+            return variable
 
     def get_objective_value(self):
         return self.model.Objective().Value()

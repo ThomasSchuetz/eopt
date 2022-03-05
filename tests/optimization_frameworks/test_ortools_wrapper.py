@@ -24,3 +24,16 @@ def test_ortools_primer():
     assert res_obj == 25.0
     assert res_x == 0.0
     assert res_y == 2.5
+
+def test_retrieve_solution_value_of_float_returns_float_itself():
+    model = ORToolsWrapper.initialize_cbc()
+    x = model.add_continuous_variable("x", 5, 10)
+    y = 12
+
+    model.set_objective(ObjectiveTypes.maximize, x * y)
+
+    model.solve()
+
+    assert model.get_result(y), 12
+
+test_retrieve_solution_value_of_float_returns_float_itself()
