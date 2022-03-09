@@ -1,10 +1,13 @@
-from energy_system_optimizer.optimization_frameworks.ortools_wrapper import ORToolsWrapper
+from energy_system_optimizer.optimization_frameworks.ortools_wrapper import (
+    ORToolsWrapper,
+)
 from energy_system_optimizer.optimization_frameworks.variable_types import VariableTypes
-from energy_system_optimizer.optimization_frameworks.objective_types import ObjectiveTypes
+from energy_system_optimizer.optimization_frameworks.objective_types import (
+    ObjectiveTypes,
+)
 
 
 def test_ortools_primer():
-
     model = ORToolsWrapper("CBC_MIXED_INTEGER_PROGRAMMING")
 
     x = model.add_variable("x", VariableTypes.continuous)
@@ -25,6 +28,7 @@ def test_ortools_primer():
     assert res_x == 0.0
     assert res_y == 2.5
 
+
 def test_retrieve_solution_value_of_float_returns_float_itself():
     model = ORToolsWrapper.initialize_cbc()
     x = model.add_continuous_variable("x", 5, 10)
@@ -35,5 +39,3 @@ def test_retrieve_solution_value_of_float_returns_float_itself():
     model.solve()
 
     assert model.get_result(y), 12
-
-test_retrieve_solution_value_of_float_returns_float_itself()

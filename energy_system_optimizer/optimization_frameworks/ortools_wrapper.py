@@ -1,5 +1,7 @@
 from energy_system_optimizer.optimization_frameworks.variable_types import VariableTypes
-from energy_system_optimizer.optimization_frameworks.objective_types import ObjectiveTypes
+from energy_system_optimizer.optimization_frameworks.objective_types import (
+    ObjectiveTypes,
+)
 from ortools.linear_solver import pywraplp
 
 
@@ -21,9 +23,10 @@ class ORToolsWrapper:
                 ub = self.model.Infinity()
             variable = self.model.NumVar(lb, ub, name)
         return variable
-    
+
     def add_binary_variable(self, name):
         return self.add_variable(name, VariableTypes.binary)
+
     def add_continuous_variable(self, name, lb=None, ub=None):
         return self.add_variable(name, VariableTypes.continuous, lb, ub)
 

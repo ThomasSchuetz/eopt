@@ -1,11 +1,11 @@
 import pytest
 from energy_system_optimizer.components.battery import Battery
-from energy_system_optimizer.components.battery_degradation_decorator import \
-    BatteryDegradationDecorator
-from energy_system_optimizer.optimization_frameworks.objective_types import \
-    ObjectiveTypes
-from energy_system_optimizer.optimization_frameworks.ortools_wrapper import \
-    ORToolsWrapper
+from energy_system_optimizer.components.battery_degradation_decorator import (
+    BatteryDegradationDecorator,
+)
+from energy_system_optimizer.optimization_frameworks.ortools_wrapper import (
+    ORToolsWrapper,
+)
 
 from test_utils.battery_utils import parameterize_battery
 from test_utils.time_utils import create_discretization
@@ -14,7 +14,11 @@ from test_utils.time_utils import create_discretization
 def test_battery_degradation_leads_to_positive_degradation_costs():
     model = ORToolsWrapper.initialize_cbc()
     battery_config = parameterize_battery(
-        energy_init=0, energy_max=100, power_max=100, efficiency=1, costs_per_full_cycle=1
+        energy_init=0,
+        energy_max=100,
+        power_max=100,
+        efficiency=1,
+        costs_per_full_cycle=1,
     )
     set_profile = [100, -100, 50]  # positive: charging
     time_steps = range(len(set_profile))
