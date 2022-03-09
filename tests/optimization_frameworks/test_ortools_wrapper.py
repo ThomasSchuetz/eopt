@@ -1,3 +1,4 @@
+import pytest
 from energy_system_optimizer.optimization_frameworks.ortools_wrapper import (
     ORToolsWrapper,
 )
@@ -39,3 +40,10 @@ def test_retrieve_solution_value_of_float_returns_float_itself():
     model.solve()
 
     assert model.get_result(y), 12
+
+
+def test_unknown_objective_type_throws_exception():
+    model = ORToolsWrapper.initialize_cbc()
+
+    with pytest.raises(ValueError):
+        model.set_objective("unknown_objective_type", "unused objective")
