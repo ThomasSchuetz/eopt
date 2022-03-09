@@ -1,4 +1,3 @@
-import py
 from energy_system_optimizer.optimization_frameworks.variable_types import VariableTypes
 from energy_system_optimizer.optimization_frameworks.objective_types import ObjectiveTypes
 from ortools.linear_solver import pywraplp
@@ -30,9 +29,6 @@ class ORToolsWrapper:
 
     def add_constraint(self, constraint, name):
         self.model.Add(constraint, name)
-
-    def sum(self, expressions):
-        return self.model.Sum(expressions)
 
     def set_objective(self, type, objective):
         if type == ObjectiveTypes.minimize:
