@@ -1,15 +1,16 @@
-from energy_system_optimizer.optimization_frameworks.variable_types import VariableTypes
+from energy_system_optimizer.optimization_frameworks.optimization_name_generator import OptimizationNameGenerator
 
 
 class Battery:
     def __init__(self, model, static_config):
         self.model = model
 
-        self.id = static_config["id"]
         self.energy_init_kWh = static_config["energy_init_kWh"]
         self.energy_max_kWh = static_config["energy_max_kWh"]
         self.power_max_kW = static_config["power_max_kW"]
         self.efficiency = static_config["efficiency"]
+
+        self._get_name = OptimizationNameGenerator("battery", static_config["id"]).get_name
 
     def add_to_model(self, discretization):
         time_steps = discretization["time_steps"]
@@ -45,9 +46,6 @@ class Battery:
             )
 
         return power_charge, power_discharge, energy, costs_ageing
-
-    def _get_name(self, postfix: str):
-        return f"battery_{id}_{postfix}"
 
     def create_variables(self, time_steps):
         power_charge = {
