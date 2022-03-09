@@ -8,24 +8,15 @@ from energy_system_optimizer.optimization_frameworks.objective_types import (
     ObjectiveTypes,
 )
 
-
-def parameterize_battery(id, energy_init, energy_max, power_max, efficiency):
-    return {
-        "id": id,
-        "energy_init_kWh": energy_init,
-        "energy_max_kWh": energy_max,
-        "power_max_kW": power_max,
-        "efficiency": efficiency,
-    }
-
-
-def create_discretization(time_steps, step_size):
-    return {"time_steps": time_steps, "dt_h": step_size}
+from test_utils.time_utils import create_discretization
+from test_utils.battery_utils import parameterize_battery
 
 
 def test_battery_charging_discharing():
     model = ORToolsWrapper.initialize_cbc()
-    battery_config = parameterize_battery(1, 0, 100, 100, 0.8)
+    battery_config = parameterize_battery(
+        energy_init=0, energy_max=100, power_max=100, efficiency=0.8
+    )
     set_profile = [50, 0, -10]  # positive: charging
     time_steps = range(len(set_profile))
     discretization = create_discretization(time_steps, 1)
@@ -51,7 +42,9 @@ def test_battery_charging_discharing():
 def test_battery_grid_integration():
     model = ORToolsWrapper.initialize_cbc()
 
-    battery_config = parameterize_battery(1, 90, 200, 50, 1)
+    battery_config = parameterize_battery(
+        energy_init=90, energy_max=200, power_max=50, efficiency=1
+    )
     load = [140, 150, 60]
 
     expected_battery_power = [-40, -50]
@@ -74,7 +67,7 @@ def test_battery_grid_integration():
             f"grid_balance_{t}",
         )
 
-    model.set_objective(ObjectiveTypes.minimize, model.sum(grid_import))
+    model.set_objective(ObjectiveTypes.minimize, sum(grid_import.values()))
 
     model.solve()
 
